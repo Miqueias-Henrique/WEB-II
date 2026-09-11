@@ -1,0 +1,58 @@
+CREATE DATABASE `Base` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+CREATE TABLE `migrations` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `timestamp` bigint DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `product_categories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `createAt` timestamp NULL DEFAULT NULL,
+  `updateAt` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `product_situations` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `createAt` timestamp NULL DEFAULT NULL,
+  `updateAt` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `products` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `productSituationId` int DEFAULT NULL,
+  `productCategoryId` int DEFAULT NULL,
+  `createAt` timestamp NULL DEFAULT NULL,
+  `updateAt` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_products_categories` (`productCategoryId`),
+  KEY `fk_products_situations` (`productSituationId`),
+  CONSTRAINT `fk_products_categories` FOREIGN KEY (`productCategoryId`) REFERENCES `product_categories` (`id`),
+  CONSTRAINT `fk_products_situations` FOREIGN KEY (`productSituationId`) REFERENCES `product_situations` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `situations` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nameSituation` varchar(255) DEFAULT NULL,
+  `createdAt` timestamp NULL DEFAULT NULL,
+  `updateAt` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `situationId` int DEFAULT NULL,
+  `creatAt` timestamp NULL DEFAULT NULL,
+  `updateat` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_users_situations` (`situationId`),
+  CONSTRAINT `fk_users_situations` FOREIGN KEY (`situationId`) REFERENCES `situations` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

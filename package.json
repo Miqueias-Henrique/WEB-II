@@ -1,0 +1,24 @@
+{
+  "name": "web-ii",
+  "version": "1.0.0",
+  "description": "* Node.js 22 ou superior - Conferir a versão: node -v\r * MySQL 8 ou superior - Conferir a versão: mysql --version",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Miqueias-Henrique/WEB-II.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Miqueias-Henrique/WEB-II/issues"
+  },
+  "homepage": "https://github.com/Miqueias-Henrique/WEB-II#readme",
+  "dependencies": {
+    "@types/node": "^22.15.2"
+  }
+}
