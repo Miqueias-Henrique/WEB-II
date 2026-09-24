@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/server.ts",
   "scripts": {
-    "start": "tsx src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "start:watch": "tsx watch src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,7 +29,9 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^22.20.2",
+    "concurrently": "^10.0.5",
     "nodemon": "^3.1.14",
-    "tsx": "^4.23.13"
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
   }
 }
