@@ -1,4 +1,4 @@
-# Node.js dependencia
+# Node.js dependencies
 node_modules/
 
 # Diretório com os arquivos compilados
@@ -17,12 +17,12 @@ yarn-error.log*
 
 # Variaveis de Ambiente
 .env
-dist
 .env.local
 .env.*.local
+*.env
 
 # Editor-specific files
-#.vscode/
+.vscode/
 .idea/
 *.swp
 *.swo
@@ -36,3 +36,4 @@ Thumbs.db
 # Other
 coverage/
 tmp/
+scratch/
