@@ -37,3 +37,6 @@ Thumbs.db
 coverage/
 tmp/
 scratch/
+
+# Relatorio local de revisao
+VALIDACAO-P1.md

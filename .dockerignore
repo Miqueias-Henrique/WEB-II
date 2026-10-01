@@ -5,6 +5,7 @@ dist
 .env.*
 !.env.example
 scratch
+VALIDACAO-P1.md
 tmp
 coverage
 *.log
