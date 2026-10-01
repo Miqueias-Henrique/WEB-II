@@ -1,0 +1,201 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API WEB II",
+    "version": "1.0.0",
+    "description": "Documentação da API de Produtos e Usuários"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor Local"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Lista todos os usuários",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "Sucesso" }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Cria um usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "João Silva" },
+                  "email": { "type": "string", "example": "joao@email.com" },
+                  "situationId": { "type": "integer", "example": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Criado com sucesso" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Busca um usuário por ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Sucesso" }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Atualiza um usuário",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "situationId": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Sucesso" }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Deleta um usuário",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Deletado com sucesso" }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Lista todos os produtos",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "Sucesso" }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Cria um produto",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Notebook Dell" },
+                  "productCategoryId": { "type": "integer", "example": 1 },
+                  "productSituationId": { "type": "integer", "example": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Criado com sucesso" }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Busca um produto por ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Sucesso" }
+        }
+      },
+      "put": {
+        "tags": ["Products"],
+        "summary": "Atualiza um produto",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "productCategoryId": { "type": "integer" },
+                  "productSituationId": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Sucesso" }
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Deleta um produto",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Deletado com sucesso" }
+        }
+      }
+    },
+    "/product-categories": {
+      "get": {
+        "tags": ["Product Categories"],
+        "summary": "Lista todas as categorias de produtos",
+        "responses": { "200": { "description": "Sucesso" } }
+      }
+    },
+    "/product-situations": {
+      "get": {
+        "tags": ["Product Situations"],
+        "summary": "Lista todas as situações de produtos",
+        "responses": { "200": { "description": "Sucesso" } }
+      }
+    },
+    "/situations": {
+      "get": {
+        "tags": ["Situations (User)"],
+        "summary": "Lista todas as situações de usuários",
+        "responses": { "200": { "description": "Sucesso" } }
+      }
+    }
+  }
+}

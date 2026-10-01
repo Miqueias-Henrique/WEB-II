@@ -1,178 +1,42 @@
-## Requisitos
+# WEB II — API P1
 
-* Node.js 22 ou superior - Conferir a versão: node -v
-* MySQL 8 ou superior - Conferir a versão: mysql --version
+API REST em Node.js, Express, TypeScript, TypeORM e MySQL baseada no diagrama da disciplina. As cinco entidades (`User`, `Situation`, `Product`, `ProductCategory` e `ProductSituation`) são os modelos persistentes da aplicação. A tabela `migrations` é administrada pelo TypeORM.
 
-## Como rodar o projeto baixado
+## Preparação
 
-Duplicar o arquivo ".env.example" e renomear para ".env".<br>
-Alterar no arquivo .env as credenciais do banco de dados<br>
+Requer Node.js 22+ e um servidor MySQL acessível. Se usar Docker, inicie o contêiner MySQL e confira a porta publicada. Crie **um banco vazio** antes da primeira migration; não execute a migration inicial sobre um banco que já contenha as tabelas da API.
 
-Instalar todas as dependencias indicada pelo package.json.
-```
-npm install
-```
+1. Copie `.env.example` para `.env` e preencha `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` e `PORT`. Não publique o `.env`.
+2. Instale as dependências com `npm ci`.
+3. Execute `npm run migration:run` para compilar e criar as tabelas. `npm run migration:show` lista o estado das migrations.
+4. Opcionalmente execute `npm run seed:run` para inserir dados de demonstração.
+5. Inicie com `npm run start:watch` para desenvolvimento, ou `npm run build` seguido de `npm start`.
 
-Compilar o arquivo TypeScript. Executar o arquivo gerado.
-```
-npm run start:watch
-```
+Com o MySQL ligado, `npm test` cria um banco temporário, verifica migrations, seeds e rotas HTTP e o remove ao terminar. O usuário configurado em `.env` precisa poder criar e remover bancos de teste.
 
-Executar as migrations para criar as tabelas no banco de dados.
-```
-npx typeorm migration:run -d dist/data-source.js
-```
+As migrations só criam a estrutura. `synchronize` fica desativado para evitar alterações automáticas no banco. O comando `migration:revert` desfaz a última migration **e pode apagar tabelas e dados**; use somente em um banco de teste.
 
-Executar as seeds para cadastrar registro de teste nas tabelas no banco de dados.
-```
-node dist/run-seeds.js
-```
-## Sequencia para criar projeto
+## Rotas
 
-Criar o arquivo package
-```
-npm init
-``` 
+Os recursos são `/users`, `/situations`, `/products`, `/product-categories` e `/product-situations`. Cada um oferece `POST /recurso`, `GET /recurso`, `GET /recurso/:id`, `PUT /recurso/:id` e `DELETE /recurso/:id`. A lista aceita `page` e `limit` (`GET /products?page=1&limit=10`). O limite máximo por página é 100. A documentação interativa fica em `http://localhost:3000/api-docs` quando `PORT=3000`.
 
-Instalar o Express para gerenciar as requisições, rotas e URLs, entre outras funcionalidade.
-``` 
-npm i express 
-``` 
+Exemplo de criação, depois de cadastrar uma situação de usuário:
 
-Instalar os pacotes para suporte ao TypeScript
-```
-npm i --save-dev @types/express
-```
-```
-npm i --save-dev @types/node@22.15.2
+```json
+POST /users
+{"name":"Maria","email":"maria@example.com","situationId":1}
 ```
 
-Instalar o compilador do projeto com TypeScript e reiniciar o projeto quando o arquivo é modificado
-```
-npm i --save-dev ts-node
-```
+Para criar um produto, cadastre antes uma categoria e uma situação de produto e envie `name`, `productCategoryId` e `productSituationId`. IDs devem ser inteiros positivos.
 
-Gerar o arquivo de configuração para o TypeScript.
-```
-npx tsc --init
-```
+## Organização
 
-Compilar o arquivo TypeScript
-```
-npx tsc
-```
+- `src/entities`: modelos e relações TypeORM.
+- `src/migrations`: criação versionada das tabelas e chaves estrangeiras.
+- `src/controllers`: respostas HTTP.
+- `src/services`: acesso aos repositórios e listagem paginada.
+- `src/routes`: rotas e validação de entrada.
+- `src/seeds.ts`: dados iniciais de demonstração.
+- `src/app.ts` e `src/server.ts`: configuração Express e inicialização do servidor.
 
-Executar o arquivo gerado com o Node.js
-```
-node dist/index.js
-```
-
-Instalar a dependência para rodar processos simultâneo.
-```
-npm i --save-dev concurrently
-```
-
-Compilar o arquivo TypeScript. Executar o arquivo gerado.
-```
-npm run start:watch
-```
-
-Criar banse de dados no myqsl 
-```
-CREATE DATABASE nodeapi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-Instalar a dependência para conectar o Node.js (TS) com BD.
-```
-npm i typeorm --save
-```
-
-Biblioteca utilizada no TypeScript para adicionar metadados (informações adicionais) a classes.
-```
-npm i reflect-metadata --save
-```
-
-Instalar o drive do banco de dados MySQL.
-```
-npm i mysql2 --save
-```
-
-Manipular variáveis de ambiente.
-```
-npm i dotenv --save
-```
-
-Instalar os tipos de variáveis para o TypeScript
-
-```
-npm i --save-dev @types/dotenv
-```
-
-Criar a MIGRATION que será usada para criar a tabela no banco de dados
-
-```
-npx typeorm migration:create src/migration/CreateSituationsTable
-``` 
-```
-npx typeorm migration:create src/migration/CreateUsersTable
-```
-```
-npx typeorm migration:create src/migration/AddSlugToProducts
-```
-```
-npx typeorm migration:create src/migration/AddPasswordToUsers
-```
-```
-npx typeorm migration:create src/migration/AddRecoverPasswordToUsers
-```
-
-
-Executar as migrations para criar as tabelas no banco de dados.
-```
-npx typeorm migration:run -d dist/data-source.js
-```
-
-Validar formulário.
-```
-npm i yup
-```
-
-Permitir requisição externa.
-```
-npm i cors
-```
-```
-npm install --save-dev @types/cors
-```
-
-Converter o slug automaticamente antes de salvar no banco de dados.
-```
-npm install slugify
-```
-
-Instalar o módulo para criptografar a senha.
-```
-npm install --save bcryptjs
-
-```
-Instalar os tipos do bcryptjs.
-```
-npm install --save-dev @types/bcryptjs
-```
-
-Instalar a dependencia JWT para manipular token de autenticação.
-```
-npm install jsonwebtoken
-```
-Instalar os tipos do jsonwebtoken.
-```
-npm i --save-dev @types/jsonwebtoken
-```
-
-Instalar o módulo para enviar e-mail.
-```
-npm install nodemailer
-```
-Instalar os tipos do nodemailer.
-```
-npm install --save-dev @types/nodemailer
+O escopo básico até a aula 5 inclui configuração, entidades, migrations, criação e consulta. Atualização, exclusão, seeds, Swagger e paginação estão presentes como extensão para a P1.

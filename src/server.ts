@@ -1,16 +1,15 @@
+import 'reflect-metadata';
 import 'dotenv/config';
-import express, { Request, Response } from 'express';
+import app from './app';
+import { AppDataSource } from './data-source';
 
-const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'API rodando perfeitamente!' });
-});
-
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
-  console.log(`Tentando apontar para o banco em ${process.env.DB_HOST}:${process.env.DB_PORT}`);
-});
+AppDataSource.initialize()
+  .then(() => {
+    console.log(`Conectado ao banco de dados MySQL via TypeORM!`);
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando em http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => console.log('Erro ao conectar com o banco de dados:', error));
