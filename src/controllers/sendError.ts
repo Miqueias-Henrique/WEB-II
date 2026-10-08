@@ -1,6 +1,11 @@
 import { Response } from 'express';
+import { PageOutOfRangeError } from '../services/PaginationService';
 
 export function sendError(res: Response, error: unknown, message: string): void {
+  if (error instanceof PageOutOfRangeError) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
   const code = (error as { driverError?: { code?: string }; code?: string })?.driverError?.code
     ?? (error as { code?: string })?.code;
 

@@ -1,5 +1,8 @@
 import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
+import { PaginatedResult, PaginationService } from './PaginationService';
+
+const pagination = new PaginationService();
 
 export class UserService {
   private repository = AppDataSource.getRepository(User);
@@ -9,14 +12,8 @@ export class UserService {
     return await this.repository.save(user);
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<{ data: User[], total: number, page: number, limit: number }> {
-    const [data, total] = await this.repository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-      relations: { situation: true }
-    });
-
-    return { data, total, page, limit };
+  async findAll(page: number = 1, limit: number = 10): Promise<PaginatedResult<User>> {
+    return pagination.paginate(this.repository, page, limit, { relations: { situation: true } });
   }
 
   async findById(id: number): Promise<User | null> {

@@ -46,11 +46,31 @@ async function main() {
       return [response.status, response.headers.get('content-type')?.includes('application/json') ? await response.json() : await response.text()];
     }
 
-    let [status, situation] = await request('POST', '/situations', { nameSituation: 'Teste' });
+    let [status, empty] = await request('GET', '/users');
+    assert.equal(status, 200);
+    assert.deepEqual({ total: empty.total, lastPage: empty.lastPage, data: empty.data }, { total: 0, lastPage: 0, data: [] });
+    [status] = await request('GET', '/users?page=2');
+    assert.equal(status, 400);
+
+    let situation;
+    [status, situation] = await request('POST', '/situations', { nameSituation: 'Teste' });
     assert.equal(status, 201);
     const situationId = situation.id;
     [status] = await request('POST', '/situations', { nameSituation: 'Teste' });
     assert.equal(status, 409);
+    let secondSituation;
+    [status, secondSituation] = await request('POST', '/situations', { nameSituation: 'Segundo' });
+    assert.equal(status, 201);
+    let firstPage, secondPage;
+    [status, firstPage] = await request('GET', '/situations?page=1&limit=1');
+    assert.equal(status, 200);
+    assert.equal(firstPage.lastPage, 2);
+    assert.equal(firstPage.data[0].id, secondSituation.id);
+    [status, secondPage] = await request('GET', '/situations?page=2&limit=1');
+    assert.equal(status, 200);
+    assert.equal(secondPage.data[0].id, situationId);
+    [status] = await request('GET', '/situations?page=3&limit=1');
+    assert.equal(status, 400);
 
     let category, productSituation, user, product;
     [status, category] = await request('POST', '/product-categories', { name: 'Categoria Teste' });
@@ -74,6 +94,32 @@ async function main() {
       assert.equal(status, 200, path);
       assert.ok(list.total >= 1, path);
     }
+    [status] = await request('PUT', `/users/${user.id}`, { name: 'Maria Atualizada' });
+    assert.equal(status, 200);
+    let updated;
+    [status, updated] = await request('GET', `/users/${user.id}`);
+    assert.equal(updated.name, 'Maria Atualizada');
+    [status] = await request('PUT', `/products/${product.id}`, { name: 'Produto Atualizado' });
+    assert.equal(status, 200);
+    [status, updated] = await request('GET', `/products/${product.id}`);
+    assert.equal(updated.name, 'Produto Atualizado');
+    for (const [path, id, body] of [
+      ['situations', situationId, { nameSituation: 'Teste Atualizado' }],
+      ['product-categories', category.id, { name: 'Categoria Atualizada' }],
+      ['product-situations', productSituation.id, { name: 'Disponível Atualizado' }],
+    ]) {
+      [status] = await request('PUT', `/${path}/${id}`, body);
+      assert.equal(status, 200, path);
+    }
+    for (const [path, id] of [
+      ['products', product.id], ['users', user.id], ['product-categories', category.id],
+      ['product-situations', productSituation.id], ['situations', situationId],
+    ]) {
+      [status] = await request('DELETE', `/${path}/${id}`);
+      assert.equal(status, 200, path);
+      [status] = await request('GET', `/${path}/${id}`);
+      assert.equal(status, 404, path);
+    }
     [status] = await request('GET', '/users/1abc');
     assert.equal(status, 400);
     [status] = await request('GET', '/products?page=0');
@@ -91,7 +137,7 @@ async function main() {
     await db.undoLastMigration();
     const [remaining] = await admin.query('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME NOT IN (?)', [dbName, 'migrations']);
     assert.equal(remaining.length, 0);
-    console.log('PASS: migration up/down, schema, seeds, CRUD POST/GET e validação HTTP em banco temporário.');
+    console.log('PASS: migration up/down, schema, seeds, CRUD completo, paginação e validação HTTP em banco temporário.');
   } finally {
     if (server) await new Promise(resolve => server.close(resolve));
     if (db?.isInitialized) await db.destroy();

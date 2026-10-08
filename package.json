@@ -11,7 +11,8 @@
     "migration:show": "npm run build && typeorm migration:show -d dist/data-source.js",
     "migration:revert": "npm run build && typeorm migration:revert -d dist/data-source.js",
     "seed:run": "npm run build && node dist/seeds.js",
-    "test": "npm run build && node tests/p1.cjs"
+    "test": "npm run build && node tests/pagination.cjs && node tests/p1.cjs",
+    "test:unit": "npm run build && node tests/pagination.cjs"
   },
   "repository": {
     "type": "git",

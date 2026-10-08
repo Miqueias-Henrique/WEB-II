@@ -1,5 +1,8 @@
 import { AppDataSource } from '../data-source';
 import { ProductCategory } from '../entities/ProductCategory';
+import { PaginatedResult, PaginationService } from './PaginationService';
+
+const pagination = new PaginationService();
 
 export class ProductCategoryService {
   private repository = AppDataSource.getRepository(ProductCategory);
@@ -9,13 +12,8 @@ export class ProductCategoryService {
     return await this.repository.save(category);
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<{ data: ProductCategory[], total: number, page: number, limit: number }> {
-    const [data, total] = await this.repository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-    });
-
-    return { data, total, page, limit };
+  async findAll(page: number = 1, limit: number = 10): Promise<PaginatedResult<ProductCategory>> {
+    return pagination.paginate(this.repository, page, limit);
   }
 
   async findById(id: number): Promise<ProductCategory | null> {

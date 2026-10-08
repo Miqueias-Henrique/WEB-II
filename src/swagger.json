@@ -3,7 +3,7 @@
   "info": {
     "title": "API WEB II",
     "version": "1.0.0",
-    "description": "Documentação da API de Produtos e Usuários"
+    "description": "Documentação da API completa para todos os 5 recursos"
   },
   "servers": [
     {
@@ -11,21 +11,113 @@
       "description": "Servidor Local"
     }
   ],
+  "components": {
+    "parameters": {
+      "pageParam": {
+        "name": "page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1
+        },
+        "description": "Número da página"
+      },
+      "limitParam": {
+        "name": "limit",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100
+        },
+        "description": "Quantidade de registros por página"
+      },
+      "idParam": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "description": "ID do recurso"
+      }
+    },
+    "schemas": {
+      "PaginatedResult": {
+        "type": "object",
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit",
+          "lastPage"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "lastPage": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  },
   "paths": {
     "/users": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Lista todos os usuários",
         "parameters": [
-          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+          {
+            "$ref": "#/components/parameters/pageParam"
+          },
+          {
+            "$ref": "#/components/parameters/limitParam"
+          }
         ],
         "responses": {
-          "200": { "description": "Sucesso" }
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros inválidos ou página inexistente"
+          }
         }
       },
       "post": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Cria um usuário",
         "requestBody": {
           "required": true,
@@ -34,35 +126,71 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string", "example": "João Silva" },
-                  "email": { "type": "string", "example": "joao@email.com" },
-                  "situationId": { "type": "integer", "example": 1 }
-                }
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "situationId": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name",
+                  "email",
+                  "situationId"
+                ],
+                "additionalProperties": false
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Criado com sucesso" }
+          "201": {
+            "description": "Criado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou referência inexistente"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
         }
       }
     },
     "/users/{id}": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Busca um usuário por ID",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
         ],
         "responses": {
-          "200": { "description": "Sucesso" }
+          "200": {
+            "description": "Sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          }
         }
       },
       "put": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Atualiza um usuário",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
         ],
         "requestBody": {
           "required": true,
@@ -71,43 +199,571 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string" },
-                  "email": { "type": "string" },
-                  "situationId": { "type": "integer" }
-                }
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "situationId": {
+                    "type": "integer"
+                  }
+                },
+                "minProperties": 1,
+                "additionalProperties": false
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Sucesso" }
+          "200": {
+            "description": "Atualizado com sucesso"
+          },
+          "400": {
+            "description": "ID ou dados inválidos"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
         }
       },
       "delete": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Deleta um usuário",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
         ],
         "responses": {
-          "200": { "description": "Deletado com sucesso" }
+          "200": {
+            "description": "Deletado com sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro em uso por outro recurso"
+          }
+        }
+      }
+    },
+    "/situations": {
+      "get": {
+        "tags": [
+          "Situations (User)"
+        ],
+        "summary": "Lista todas as situações de usuários",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageParam"
+          },
+          {
+            "$ref": "#/components/parameters/limitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros inválidos ou página inexistente"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Situations (User)"
+        ],
+        "summary": "Cria uma situação de usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nameSituation": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "nameSituation"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou referência inexistente"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/situations/{id}": {
+      "get": {
+        "tags": [
+          "Situations (User)"
+        ],
+        "summary": "Busca uma situação de usuário por ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Situations (User)"
+        ],
+        "summary": "Atualiza uma situação de usuário",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nameSituation": {
+                    "type": "string"
+                  }
+                },
+                "minProperties": 1,
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Atualizado com sucesso"
+          },
+          "400": {
+            "description": "ID ou dados inválidos"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Situations (User)"
+        ],
+        "summary": "Deleta uma situação de usuário",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deletado com sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro em uso por outro recurso"
+          }
+        }
+      }
+    },
+    "/product-categories": {
+      "get": {
+        "tags": [
+          "Product Categories"
+        ],
+        "summary": "Lista todas as categorias de produtos",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageParam"
+          },
+          {
+            "$ref": "#/components/parameters/limitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros inválidos ou página inexistente"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Product Categories"
+        ],
+        "summary": "Cria uma categoria de produto",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou referência inexistente"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/product-categories/{id}": {
+      "get": {
+        "tags": [
+          "Product Categories"
+        ],
+        "summary": "Busca uma categoria de produto por ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Product Categories"
+        ],
+        "summary": "Atualiza uma categoria de produto",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "minProperties": 1,
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Atualizado com sucesso"
+          },
+          "400": {
+            "description": "ID ou dados inválidos"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Product Categories"
+        ],
+        "summary": "Deleta uma categoria de produto",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deletado com sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro em uso por outro recurso"
+          }
+        }
+      }
+    },
+    "/product-situations": {
+      "get": {
+        "tags": [
+          "Product Situations"
+        ],
+        "summary": "Lista todas as situações de produtos",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageParam"
+          },
+          {
+            "$ref": "#/components/parameters/limitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros inválidos ou página inexistente"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Product Situations"
+        ],
+        "summary": "Cria uma situação de produto",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou referência inexistente"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/product-situations/{id}": {
+      "get": {
+        "tags": [
+          "Product Situations"
+        ],
+        "summary": "Busca uma situação de produto por ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Product Situations"
+        ],
+        "summary": "Atualiza uma situação de produto",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "minProperties": 1,
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Atualizado com sucesso"
+          },
+          "400": {
+            "description": "ID ou dados inválidos"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Product Situations"
+        ],
+        "summary": "Deleta uma situação de produto",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deletado com sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro em uso por outro recurso"
+          }
         }
       }
     },
     "/products": {
       "get": {
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "summary": "Lista todos os produtos",
         "parameters": [
-          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+          {
+            "$ref": "#/components/parameters/pageParam"
+          },
+          {
+            "$ref": "#/components/parameters/limitParam"
+          }
         ],
         "responses": {
-          "200": { "description": "Sucesso" }
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros inválidos ou página inexistente"
+          }
         }
       },
       "post": {
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "summary": "Cria um produto",
         "requestBody": {
           "required": true,
@@ -116,35 +772,71 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string", "example": "Notebook Dell" },
-                  "productCategoryId": { "type": "integer", "example": 1 },
-                  "productSituationId": { "type": "integer", "example": 1 }
-                }
+                  "name": {
+                    "type": "string"
+                  },
+                  "productCategoryId": {
+                    "type": "integer"
+                  },
+                  "productSituationId": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name",
+                  "productCategoryId",
+                  "productSituationId"
+                ],
+                "additionalProperties": false
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Criado com sucesso" }
+          "201": {
+            "description": "Criado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou referência inexistente"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
         }
       }
     },
     "/products/{id}": {
       "get": {
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "summary": "Busca um produto por ID",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
         ],
         "responses": {
-          "200": { "description": "Sucesso" }
+          "200": {
+            "description": "Sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          }
         }
       },
       "put": {
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "summary": "Atualiza um produto",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
         ],
         "requestBody": {
           "required": true,
@@ -153,48 +845,61 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string" },
-                  "productCategoryId": { "type": "integer" },
-                  "productSituationId": { "type": "integer" }
-                }
+                  "name": {
+                    "type": "string"
+                  },
+                  "productCategoryId": {
+                    "type": "integer"
+                  },
+                  "productSituationId": {
+                    "type": "integer"
+                  }
+                },
+                "minProperties": 1,
+                "additionalProperties": false
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Sucesso" }
+          "200": {
+            "description": "Atualizado com sucesso"
+          },
+          "400": {
+            "description": "ID ou dados inválidos"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
         }
       },
       "delete": {
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "summary": "Deleta um produto",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
         ],
         "responses": {
-          "200": { "description": "Deletado com sucesso" }
+          "200": {
+            "description": "Deletado com sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "404": {
+            "description": "Registro não encontrado"
+          },
+          "409": {
+            "description": "Registro em uso por outro recurso"
+          }
         }
-      }
-    },
-    "/product-categories": {
-      "get": {
-        "tags": ["Product Categories"],
-        "summary": "Lista todas as categorias de produtos",
-        "responses": { "200": { "description": "Sucesso" } }
-      }
-    },
-    "/product-situations": {
-      "get": {
-        "tags": ["Product Situations"],
-        "summary": "Lista todas as situações de produtos",
-        "responses": { "200": { "description": "Sucesso" } }
-      }
-    },
-    "/situations": {
-      "get": {
-        "tags": ["Situations (User)"],
-        "summary": "Lista todas as situações de usuários",
-        "responses": { "200": { "description": "Sucesso" } }
       }
     }
   }
