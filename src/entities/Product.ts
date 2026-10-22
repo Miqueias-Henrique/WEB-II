@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import type { Relation } from 'typeorm';
 import { ProductCategory } from './ProductCategory';
 import { ProductSituation } from './ProductSituation';
 
@@ -16,13 +17,13 @@ export class Product {
   @Column({ type: 'int', nullable: true })
   productCategoryId!: number;
 
-  @ManyToOne(() => ProductSituation)
+  @ManyToOne(() => ProductSituation, (situation) => situation.products, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'productSituationId' })
-  productSituation!: ProductSituation;
+  productSituation!: Relation<ProductSituation>;
 
-  @ManyToOne(() => ProductCategory)
+  @ManyToOne(() => ProductCategory, (category) => category.products, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'productCategoryId' })
-  productCategory!: ProductCategory;
+  productCategory!: Relation<ProductCategory>;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;

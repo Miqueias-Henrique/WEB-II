@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import type { Relation } from 'typeorm';
 import { Situation } from './Situation';
 
 @Entity('users')
@@ -15,9 +16,9 @@ export class User {
   @Column({ type: 'int', nullable: true })
   situationId!: number;
 
-  @ManyToOne(() => Situation)
+  @ManyToOne(() => Situation, (situation) => situation.users, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'situationId' })
-  situation!: Situation;
+  situation!: Relation<Situation>;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;
