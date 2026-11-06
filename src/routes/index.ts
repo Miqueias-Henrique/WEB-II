@@ -26,10 +26,10 @@ routes.put('/users/:id', validateId, validateBody('users', false), userControlle
 routes.delete('/users/:id', validateId, userController.delete);
 
 // Situations
-routes.post('/situations', validateBody('situations', true), situationController.create);
+routes.post('/situations', situationController.create);
 routes.get('/situations', validatePagination, situationController.getAll);
 routes.get('/situations/:id', validateId, situationController.getById);
-routes.put('/situations/:id', validateId, validateBody('situations', false), situationController.update);
+routes.put('/situations/:id', validateId, situationController.update);
 routes.delete('/situations/:id', validateId, situationController.delete);
 
 // Product Categories

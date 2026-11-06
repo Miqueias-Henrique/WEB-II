@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import * as yup from 'yup';
 import { sendError } from './sendError';
 import { SituationService } from '../services/SituationService';
 
@@ -7,9 +8,26 @@ const situationService = new SituationService();
 export class SituationController {
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const result = await situationService.create(req.body);
+      const data = req.body;
+
+      const schema = yup.object().shape({
+        nameSituation: yup
+          .string()
+          .required('O campo nome é obrigatório!')
+          .min(3, 'O campo nome deve ter no mínimo 3 caracteres!'),
+      });
+
+      await schema.validate(data, { abortEarly: false });
+
+      const result = await situationService.create(data);
       res.status(201).json(result);
     } catch (error: any) {
+      if (error instanceof yup.ValidationError) {
+        res.status(400).json({
+          error: error.errors,
+        });
+        return;
+      }
       sendError(res, error, 'Erro ao criar situation');
     }
   }
@@ -39,10 +57,27 @@ export class SituationController {
   async update(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id as string);
-      const updated = await situationService.update(id, req.body);
+      const data = req.body;
+
+      const schema = yup.object().shape({
+        nameSituation: yup
+          .string()
+          .required('O campo nome é obrigatório!')
+          .min(3, 'O campo nome deve ter no mínimo 3 caracteres!'),
+      });
+
+      await schema.validate(data, { abortEarly: false });
+
+      const updated = await situationService.update(id, data);
       if (!updated) { res.status(404).json({ error: 'Situation não encontrada para atualizar' }); return; }
       res.json({ message: 'Situation atualizada com sucesso' });
     } catch (error: any) {
+      if (error instanceof yup.ValidationError) {
+        res.status(400).json({
+          error: error.errors,
+        });
+        return;
+      }
       sendError(res, error, 'Erro ao atualizar situation');
     }
   }

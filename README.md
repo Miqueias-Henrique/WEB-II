@@ -29,14 +29,30 @@ POST /users
 
 Para criar um produto, cadastre antes uma categoria e uma situação de produto e envie `name`, `productCategoryId` e `productSituationId`. IDs devem ser inteiros positivos.
 
+## Validação de Dados com Yup (Aula 11)
+
+Para validar os dados recebidos em tempo de execução, o projeto utiliza a biblioteca **Yup** (construtor de esquemas):
+
+```bash
+npm i yup
+```
+
+No controlador `src/controllers/SituationController.ts`, as rotas de cadastro (`POST /situations`) e edição (`PUT /situations/:id`) validam o campo `nameSituation` antes de acionar o repositório do TypeORM:
+
+- `string()`: deve ser do tipo texto.
+- `required("O campo nome é obrigatório!")`: preenchimento obrigatório.
+- `min(3, "O campo nome deve ter no mínimo 3 caracteres!")`: mínimo de 3 caracteres.
+
+A validação é executada de forma assíncrona com `await schema.validate(data, { abortEarly: false })`, acumulando todos os erros encontrados. Caso uma `yup.ValidationError` seja lançada, o controller responde imediatamente com HTTP `400 (Bad Request)` contendo `{ error: error.errors }` e encerra o fluxo com `return;`.
+
 ## Organização
 
 - `src/entities`: modelos e relações TypeORM.
 - `src/migrations`: criação versionada das tabelas e chaves estrangeiras.
-- `src/controllers`: respostas HTTP.
+- `src/controllers`: respostas HTTP e validação com Yup (`SituationController.ts`).
 - `src/services`: acesso aos repositórios e serviço compartilhado de paginação.
 - `src/routes`: rotas e validação de entrada.
 - `src/seeds.ts`: dados iniciais de demonstração.
 - `src/app.ts` e `src/server.ts`: configuração Express e inicialização do servidor.
 
-O escopo básico até a aula 5 inclui configuração, entidades, migrations, criação e consulta. Atualização, exclusão, seeds, Swagger e paginação completam as demais partes da P1.
+O escopo básico até a aula 5 inclui configuração, entidades, migrations, criação e consulta. Atualização, exclusão, seeds, Swagger, paginação e validação com Yup (aula 11) completam as demais partes do projeto.

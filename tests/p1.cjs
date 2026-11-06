@@ -52,10 +52,32 @@ async function main() {
     [status] = await request('GET', '/users?page=2');
     assert.equal(status, 400);
 
+    let invalidSituation;
+    [status, invalidSituation] = await request('POST', '/situations', {});
+    assert.equal(status, 400);
+    assert.deepEqual(invalidSituation, { error: ['O campo nome é obrigatório!'] });
+    [status, invalidSituation] = await request('POST', '/situations', { nameSituation: '' });
+    assert.equal(status, 400);
+    assert.deepEqual(invalidSituation, {
+      error: [
+        'O campo nome é obrigatório!',
+        'O campo nome deve ter no mínimo 3 caracteres!',
+      ],
+    });
+    [status, invalidSituation] = await request('POST', '/situations', { nameSituation: 'ab' });
+    assert.equal(status, 400);
+    assert.deepEqual(invalidSituation, { error: ['O campo nome deve ter no mínimo 3 caracteres!'] });
+
     let situation;
     [status, situation] = await request('POST', '/situations', { nameSituation: 'Teste' });
     assert.equal(status, 201);
     const situationId = situation.id;
+    [status, invalidSituation] = await request('PUT', `/situations/${situationId}`, {});
+    assert.equal(status, 400);
+    assert.deepEqual(invalidSituation, { error: ['O campo nome é obrigatório!'] });
+    [status, invalidSituation] = await request('PUT', `/situations/${situationId}`, { nameSituation: 'ab' });
+    assert.equal(status, 400);
+    assert.deepEqual(invalidSituation, { error: ['O campo nome deve ter no mínimo 3 caracteres!'] });
     [status] = await request('POST', '/situations', { nameSituation: 'Teste' });
     assert.equal(status, 409);
     let secondSituation;
