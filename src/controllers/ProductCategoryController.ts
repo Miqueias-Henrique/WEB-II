@@ -9,7 +9,7 @@ export class ProductCategoryController {
     try {
       const result = await productCategoryService.create(req.body);
       res.status(201).json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao criar product category');
     }
   }
@@ -20,7 +20,7 @@ export class ProductCategoryController {
       const limit = parseInt(req.query.limit as string) || 10;
       const result = await productCategoryService.findAll(page, limit);
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar product categories');
     }
   }
@@ -31,7 +31,7 @@ export class ProductCategoryController {
       const result = await productCategoryService.findById(id);
       if (!result) { res.status(404).json({ error: 'Product Category não encontrada' }); return; }
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar product category');
     }
   }
@@ -42,7 +42,7 @@ export class ProductCategoryController {
       const updated = await productCategoryService.update(id, req.body);
       if (!updated) { res.status(404).json({ error: 'Product Category não encontrada para atualizar' }); return; }
       res.json({ message: 'Product Category atualizada com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao atualizar product category');
     }
   }
@@ -53,7 +53,7 @@ export class ProductCategoryController {
       const deleted = await productCategoryService.delete(id);
       if (!deleted) { res.status(404).json({ error: 'Product Category não encontrada para deletar' }); return; }
       res.json({ message: 'Product Category deletada com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao deletar product category');
     }
   }

@@ -10,7 +10,7 @@ export class UserController {
     try {
       const user = await userService.create(req.body);
       res.status(201).json(user);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao criar usuário');
     }
   }
@@ -22,7 +22,7 @@ export class UserController {
 
       const result = await userService.findAll(page, limit);
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar usuários');
     }
   }
@@ -38,7 +38,7 @@ export class UserController {
       }
 
       res.json(user);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar usuário');
     }
   }
@@ -54,7 +54,7 @@ export class UserController {
       }
 
       res.json({ message: 'Usuário atualizado com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao atualizar usuário');
     }
   }
@@ -70,7 +70,7 @@ export class UserController {
       }
 
       res.json({ message: 'Usuário deletado com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao deletar usuário');
     }
   }

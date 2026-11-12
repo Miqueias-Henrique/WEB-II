@@ -19,9 +19,17 @@ export class SituationController {
 
       await schema.validate(data, { abortEarly: false });
 
-      const result = await situationService.create(data);
+      const existingSituation = await situationService.findByName(data.nameSituation);
+      if (existingSituation) {
+        res.status(400).json({
+          error: 'Já existe uma situação cadastrada com esse nome.',
+        });
+        return;
+      }
+
+      const result = await situationService.create({ nameSituation: data.nameSituation });
       res.status(201).json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof yup.ValidationError) {
         res.status(400).json({
           error: error.errors,
@@ -38,7 +46,7 @@ export class SituationController {
       const limit = parseInt(req.query.limit as string) || 10;
       const result = await situationService.findAll(page, limit);
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar situations');
     }
   }
@@ -49,7 +57,7 @@ export class SituationController {
       const result = await situationService.findById(id);
       if (!result) { res.status(404).json({ error: 'Situation não encontrada' }); return; }
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar situation');
     }
   }
@@ -68,10 +76,24 @@ export class SituationController {
 
       await schema.validate(data, { abortEarly: false });
 
-      const updated = await situationService.update(id, data);
+      const situation = await situationService.findById(id);
+      if (!situation) {
+        res.status(404).json({ error: 'Situation não encontrada para atualizar' });
+        return;
+      }
+
+      const existingSituation = await situationService.findByName(data.nameSituation, id);
+      if (existingSituation) {
+        res.status(400).json({
+          error: 'Já existe uma situação cadastrada com esse nome.',
+        });
+        return;
+      }
+
+      const updated = await situationService.update(id, { nameSituation: data.nameSituation });
       if (!updated) { res.status(404).json({ error: 'Situation não encontrada para atualizar' }); return; }
       res.json({ message: 'Situation atualizada com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof yup.ValidationError) {
         res.status(400).json({
           error: error.errors,
@@ -88,7 +110,7 @@ export class SituationController {
       const deleted = await situationService.delete(id);
       if (!deleted) { res.status(404).json({ error: 'Situation não encontrada para deletar' }); return; }
       res.json({ message: 'Situation deletada com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao deletar situation');
     }
   }

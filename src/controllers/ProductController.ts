@@ -9,7 +9,7 @@ export class ProductController {
     try {
       const result = await productService.create(req.body);
       res.status(201).json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao criar product');
     }
   }
@@ -20,7 +20,7 @@ export class ProductController {
       const limit = parseInt(req.query.limit as string) || 10;
       const result = await productService.findAll(page, limit);
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar products');
     }
   }
@@ -31,7 +31,7 @@ export class ProductController {
       const result = await productService.findById(id);
       if (!result) { res.status(404).json({ error: 'Product não encontrado' }); return; }
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar product');
     }
   }
@@ -42,7 +42,7 @@ export class ProductController {
       const updated = await productService.update(id, req.body);
       if (!updated) { res.status(404).json({ error: 'Product não encontrado para atualizar' }); return; }
       res.json({ message: 'Product atualizado com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao atualizar product');
     }
   }
@@ -53,7 +53,7 @@ export class ProductController {
       const deleted = await productService.delete(id);
       if (!deleted) { res.status(404).json({ error: 'Product não encontrado para deletar' }); return; }
       res.json({ message: 'Product deletado com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao deletar product');
     }
   }

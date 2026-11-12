@@ -9,7 +9,7 @@ export class ProductSituationController {
     try {
       const result = await productSituationService.create(req.body);
       res.status(201).json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao criar product situation');
     }
   }
@@ -20,7 +20,7 @@ export class ProductSituationController {
       const limit = parseInt(req.query.limit as string) || 10;
       const result = await productSituationService.findAll(page, limit);
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar product situations');
     }
   }
@@ -31,7 +31,7 @@ export class ProductSituationController {
       const result = await productSituationService.findById(id);
       if (!result) { res.status(404).json({ error: 'Product Situation não encontrada' }); return; }
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao buscar product situation');
     }
   }
@@ -42,7 +42,7 @@ export class ProductSituationController {
       const updated = await productSituationService.update(id, req.body);
       if (!updated) { res.status(404).json({ error: 'Product Situation não encontrada para atualizar' }); return; }
       res.json({ message: 'Product Situation atualizada com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao atualizar product situation');
     }
   }
@@ -53,7 +53,7 @@ export class ProductSituationController {
       const deleted = await productSituationService.delete(id);
       if (!deleted) { res.status(404).json({ error: 'Product Situation não encontrada para deletar' }); return; }
       res.json({ message: 'Product Situation deletada com sucesso' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendError(res, error, 'Erro ao deletar product situation');
     }
   }

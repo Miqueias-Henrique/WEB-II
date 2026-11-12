@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 
-type Field = 'name' | 'email' | 'nameSituation' | 'situationId' | 'productCategoryId' | 'productSituationId';
+type Field = 'name' | 'email' | 'situationId' | 'productCategoryId' | 'productSituationId';
+type Resource = 'users' | 'product-categories' | 'product-situations' | 'products';
 
-const schemas: Record<string, Field[]> = {
+const schemas: Record<Resource, Field[]> = {
   users: ['name', 'email', 'situationId'],
-  situations: ['nameSituation'],
   'product-categories': ['name'],
   'product-situations': ['name'],
   products: ['name', 'productCategoryId', 'productSituationId'],
@@ -14,7 +14,7 @@ function isPositiveInteger(value: unknown): boolean {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
 }
 
-export function validateBody(resource: keyof typeof schemas, create: boolean) {
+export function validateBody(resource: Resource, create: boolean) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const body: unknown = req.body;
     if (body === null || typeof body !== 'object' || Array.isArray(body)) {

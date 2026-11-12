@@ -316,10 +316,7 @@
             "description": "Criado com sucesso"
           },
           "400": {
-            "description": "Dados inválidos ou referência inexistente"
-          },
-          "409": {
-            "description": "Registro duplicado"
+            "description": "Dados inválidos ou situação já cadastrada com esse nome"
           }
         }
       }
@@ -383,13 +380,10 @@
             "description": "Atualizado com sucesso"
           },
           "400": {
-            "description": "ID ou dados inválidos"
+            "description": "ID, dados inválidos ou situação já cadastrada com esse nome"
           },
           "404": {
             "description": "Registro não encontrado"
-          },
-          "409": {
-            "description": "Registro duplicado"
           }
         }
       },

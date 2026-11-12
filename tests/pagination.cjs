@@ -31,8 +31,39 @@ async function main() {
   console.log('PASS: paginação, ordenação, relações e página inexistente.');
 
   const { SituationService } = require('../dist/services/SituationService');
-  SituationService.prototype.create = async (data) => ({ id: 1, ...data });
-  SituationService.prototype.update = async (_id, _data) => true;
+  const serviceInstance = new SituationService();
+  let findOneQuery;
+  serviceInstance.repository = {
+    async findOne(query) {
+      findOneQuery = query;
+      return null;
+    },
+  };
+  await serviceInstance.findByName('Ativo');
+  assert.deepEqual(findOneQuery, { where: { nameSituation: 'Ativo' } });
+  await serviceInstance.findByName('Ativo', 1);
+  assert.equal(findOneQuery.where.nameSituation, 'Ativo');
+  assert.equal(findOneQuery.where.id._type, 'not');
+  assert.equal(findOneQuery.where.id._value, 1);
+
+  const memorySituations = [];
+  SituationService.prototype.findById = async (id) =>
+    memorySituations.find((item) => item.id === id) ?? null;
+  SituationService.prototype.findByName = async (nameSituation, ignoreId) =>
+    memorySituations.find(
+      (item) => item.nameSituation === nameSituation && (ignoreId === undefined || item.id !== ignoreId)
+    ) ?? null;
+  SituationService.prototype.create = async (data) => {
+    const created = { id: memorySituations.length + 1, ...data };
+    memorySituations.push(created);
+    return created;
+  };
+  SituationService.prototype.update = async (id, data) => {
+    const item = memorySituations.find((row) => row.id === id);
+    if (!item) return false;
+    Object.assign(item, data);
+    return true;
+  };
 
   const app = require('../dist/app').default;
   const server = app.listen(0);
@@ -68,6 +99,14 @@ async function main() {
     assert.equal(status, 201);
     assert.deepEqual(body, { id: 1, nameSituation: 'Ativo' });
 
+    [status, body] = await request('POST', '/situations', { nameSituation: 'Ativo' });
+    assert.equal(status, 400);
+    assert.deepEqual(body, { error: 'Já existe uma situação cadastrada com esse nome.' });
+
+    [status, body] = await request('POST', '/situations', { nameSituation: 'Pendente' });
+    assert.equal(status, 201);
+    assert.deepEqual(body, { id: 2, nameSituation: 'Pendente' });
+
     [status, body] = await request('PUT', '/situations/1', {});
     assert.equal(status, 400);
     assert.deepEqual(body, { error: ['O campo nome é obrigatório!'] });
@@ -85,11 +124,24 @@ async function main() {
     assert.equal(status, 400);
     assert.deepEqual(body, { error: ['O campo nome deve ter no mínimo 3 caracteres!'] });
 
-    [status, body] = await request('PUT', '/situations/1', { nameSituation: 'Inativo' });
+    [status, body] = await request('PUT', '/situations/999', { nameSituation: 'Inativo' });
+    assert.equal(status, 404);
+    assert.deepEqual(body, { error: 'Situation não encontrada para atualizar' });
+
+    [status, body] = await request('PUT', '/situations/1', { nameSituation: 'Pendente' });
+    assert.equal(status, 400);
+    assert.deepEqual(body, { error: 'Já existe uma situação cadastrada com esse nome.' });
+
+    [status, body] = await request('PUT', '/situations/1', { nameSituation: 'Ativo' });
     assert.equal(status, 200);
     assert.deepEqual(body, { message: 'Situation atualizada com sucesso' });
 
-    console.log('PASS: validação Yup em POST /situations e PUT /situations/:id (400 Bad Request, 201 Created e 200 OK).');
+    [status, body] = await request('PUT', '/situations/1', { nameSituation: 'Inativo', extraField: 'ignorado' });
+    assert.equal(status, 200);
+    assert.deepEqual(body, { message: 'Situation atualizada com sucesso' });
+    assert.deepEqual(memorySituations[0], { id: 1, nameSituation: 'Inativo' });
+
+    console.log('PASS: validação de situations (Yup e duplicidade).');
   } finally {
     await new Promise(resolve => server.close(resolve));
   }

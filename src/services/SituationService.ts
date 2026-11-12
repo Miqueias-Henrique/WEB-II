@@ -1,3 +1,4 @@
+import { Not } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import { Situation } from '../entities/Situation';
 import { PaginatedResult, PaginationService } from './PaginationService';
@@ -18,6 +19,20 @@ export class SituationService {
 
   async findById(id: number): Promise<Situation | null> {
     return await this.repository.findOneBy({ id });
+  }
+
+  async findByName(nameSituation: string, ignoreId?: number): Promise<Situation | null> {
+    if (ignoreId !== undefined) {
+      return await this.repository.findOne({
+        where: {
+          nameSituation,
+          id: Not(ignoreId),
+        },
+      });
+    }
+    return await this.repository.findOne({
+      where: { nameSituation },
+    });
   }
 
   async update(id: number, data: Partial<Situation>): Promise<boolean> {
