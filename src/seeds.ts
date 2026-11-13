@@ -15,7 +15,6 @@ async function runSeeds() {
     const userSitRepo = AppDataSource.getRepository(Situation);
     const userRepo = AppDataSource.getRepository(User);
 
-    // 1. Categorias
     const categories = ['Eletrônicos', 'Móveis', 'Roupas', 'Alimentos'];
     for (const name of categories) {
       if (!(await categoryRepo.findOneBy({ name }))) {
@@ -24,7 +23,6 @@ async function runSeeds() {
     }
     console.log('Categorias verificadas/inseridas.');
 
-    // 2. Situações Produto
     const productSituations = ['Em Estoque', 'Esgotado', 'Descontinuado'];
     for (const name of productSituations) {
       if (!(await prodSitRepo.findOneBy({ name }))) {
@@ -33,7 +31,6 @@ async function runSeeds() {
     }
     console.log('Situações de Produto verificadas/inseridas.');
 
-    // 3. Situações Usuário
     const userSituations = ['Ativo', 'Inativo', 'Banido'];
     for (const nameSituation of userSituations) {
       if (!(await userSitRepo.findOneBy({ nameSituation }))) {
@@ -42,7 +39,6 @@ async function runSeeds() {
     }
     console.log('Situações de Usuário verificadas/inseridas.');
 
-    // 4. Admin User
     const activeSituation = await userSitRepo.findOneByOrFail({ nameSituation: 'Ativo' });
     if (!(await userRepo.findOneBy({ email: 'admin@sistema.com' }))) {
       await userRepo.save(userRepo.create({
@@ -53,7 +49,6 @@ async function runSeeds() {
       console.log('Usuário Admin verificado/inserido.');
     }
 
-    // 5. Produtos
     const productRepo = AppDataSource.getRepository(Product);
     const inStock = await prodSitRepo.findOneByOrFail({ name: 'Em Estoque' });
     const products = [
