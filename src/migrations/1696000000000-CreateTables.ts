@@ -9,7 +9,6 @@ export class CreateTables1696000000000 implements MigrationInterface {
             }
         }
 
-        // 1. situations
         await queryRunner.createTable(new Table({
             name: "situations",
             columns: [
@@ -20,7 +19,6 @@ export class CreateTables1696000000000 implements MigrationInterface {
             ]
         }), true);
 
-        // 2. product_categories
         await queryRunner.createTable(new Table({
             name: "product_categories",
             columns: [
@@ -31,7 +29,6 @@ export class CreateTables1696000000000 implements MigrationInterface {
             ]
         }), true);
 
-        // 3. product_situations
         await queryRunner.createTable(new Table({
             name: "product_situations",
             columns: [
@@ -42,7 +39,6 @@ export class CreateTables1696000000000 implements MigrationInterface {
             ]
         }), true);
 
-        // 4. users
         await queryRunner.createTable(new Table({
             name: "users",
             columns: [
@@ -55,7 +51,6 @@ export class CreateTables1696000000000 implements MigrationInterface {
             ]
         }), true);
 
-        // 5. products
         await queryRunner.createTable(new Table({
             name: "products",
             columns: [
@@ -68,7 +63,6 @@ export class CreateTables1696000000000 implements MigrationInterface {
             ]
         }), true);
 
-        // Foreign Keys
         await queryRunner.createForeignKey("users", new TableForeignKey({
             columnNames: ["situationId"],
             referencedColumnNames: ["id"],
@@ -92,7 +86,6 @@ export class CreateTables1696000000000 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        // Drop FKs first
         const productsTable = await queryRunner.getTable("products");
         if (productsTable) {
             const productSituationFk = productsTable.foreignKeys.find(fk => fk.columnNames.indexOf("productSituationId") !== -1);
@@ -108,7 +101,6 @@ export class CreateTables1696000000000 implements MigrationInterface {
             if (situationFk) await queryRunner.dropForeignKey("users", situationFk);
         }
 
-        // Drop tables
         await queryRunner.dropTable("products");
         await queryRunner.dropTable("users");
         await queryRunner.dropTable("product_situations");
